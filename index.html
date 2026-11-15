@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Delta: a DFA description language</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header>
+  <h1><b>δ</b> <i class="b">D</i><i class="r">e</i><i class="y">l</i><i class="b">t</i><i class="g">a</i></h1>
+  <span class="tag">DFA description language</span>
+  <button id="open" class="ghost">Open file</button>
+  <button id="save" class="ghost">Save</button>
+  <input type="file" id="file" accept=".delta,.txt" hidden>
+  <button id="compile" class="primary" title="Ctrl + Enter">Compile</button>
+</header>
+
+<nav id="stages" aria-label="Compiler stages">
+  <span data-stage="lexical">Lexical analysis</span>
+  <span data-stage="syntax">Syntax analysis</span>
+  <span data-stage="semantic">Semantic analysis</span>
+  <span data-stage="diagram">Diagram</span>
+  <em id="summary"></em>
+</nav>
+
+<main>
+  <section id="editor" aria-label="Program editor">
+    <div class="head"><h2>Program</h2>
+      <div id="palette">Insert
+        <button>δ</button><button>Σ</button><button>×</button><button>→</button><button>ε</button>
+      </div>
+    </div>
+    <div id="code">
+      <div id="gutter"></div>
+      <textarea id="src" placeholder="M = (Q, Σ, δ, q0, F)" wrap="off" spellcheck="false"
+                autocomplete="off" aria-label="Delta source code"></textarea>
+    </div>
+  </section>
+
+  <section id="canvas" aria-label="State diagram">
+    <div class="head"><h2>State diagram</h2><span id="dfaname"></span></div>
+    <div id="stagewrap">
+      <svg id="diagram" viewBox="0 0 800 480" role="img" aria-label="DFA state diagram"></svg>
+      <div id="overlay" hidden></div>
+    </div>
+    <div id="sim">
+      <label for="word">Test an input string</label>
+      <input id="word" placeholder="e.g. abcb" autocomplete="off" spellcheck="false">
+      <button id="step">Step</button><button id="run">Run</button><button id="reset">Reset</button>
+      <div id="trace" aria-live="polite"></div>
+    </div>
+  </section>
+
+  <section id="panel" aria-label="Compiler output">
+    <div id="tabs" role="tablist"></div>
+    <div id="tabbody"></div>
+  </section>
+</main>
+
+<script src="js/core.js"></script>
+<script src="js/ide.js"></script>
+</body>
+</html>

@@ -1,0 +1,6 @@
+# Tests syntax handling for incomplete sets and invalid characters.
+
+M = (Q, Σ, δ, q0, F)
+Q = {q1, q2
+Σ = {a, b}
+δ(q1,a)=q2 %

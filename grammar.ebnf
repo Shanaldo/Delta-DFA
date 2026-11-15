@@ -1,0 +1,71 @@
+(* ======================================================================
+   DELTA: a language for describing a DFA  D = (Q, Σ, δ, q0, F)
+   CIT4004 group project. Notation: EBNF
+     =  is defined as      |  or          ;  ends a rule
+     { x }  zero or more   [ x ]  optional   ( x )  grouping
+     "text"  must appear exactly as written
+   ====================================================================== *)
+
+
+(* ---------- 1. LEXICAL RULES (what the lexer produces) ---------- *)
+
+NAME     = letter , { letter | digit | "_" | "'" } ;   (* states, symbols, identifiers *)
+DELTA    = "δ"  | "delta" ;                            (* reserved word *)
+SIGMA    = "Σ"  | "Sigma" ;                            (* reserved word *)
+EPSILON  = "ε"  | "epsilon" ;                          (* reserved word, lexed only so misuse gets a clear error *)
+ARROW    = "→"  | "->" ;
+CROSS    = "×"  | "*" ;
+NEWLINE  = line break ;                                (* only matters inside a transition table *)
+COMMENT  = "#" , { any character except line break } ; (* skipped, produces no token *)
+(* spaces and tabs are skipped. Subscript digits (q₀, q₁) count as digits. *)
+
+
+(* ---------- 2. SYNTAX RULES (what the parser checks) ---------- *)
+
+program     = NAME , "=" , tuple , { statement } ;
+
+tuple       = "(" , value , "," , value , "," , DELTA , "," , NAME , "," , value , ")" ;
+              (*        Q            Σ                δ          q0           F        *)
+
+value       = NAME | SIGMA | set ;           (* a name defined later, or the set written inline *)
+set         = "{" , [ symbol , { "," , symbol } ] , "}" ;
+symbol      = NAME | EPSILON ;               (* EPSILON is allowed here, then rejected by semantic analysis *)
+
+statement   = definition | signature | transition | table ;
+
+definition  = ( NAME | SIGMA ) , "=" , ( set | NAME ) ;     (* Q = {...}   Σ = {...}   q0 = q1   F = {...} *)
+signature   = DELTA , "=" , ref , cross , ref , ARROW , ref ; (* δ = Q × Σ → Q *)
+transition  = DELTA , "(" , NAME , "," , symbol , ")" , "=" , NAME ;   (* δ(q1,a)=q2 *)
+table       = DELTA , symbol , { symbol } , NEWLINE , row , { row } ;  (* header line, then one row per state *)
+row         = NAME , NAME , { NAME } , NEWLINE ;             (* state, then one target per column *)
+
+ref         = NAME | SIGMA ;
+cross       = CROSS | "x" ;                  (* "x" is an ordinary NAME that is accepted here *)
+
+
+(* ---------- 3. RULES THE GRAMMAR CANNOT EXPRESS (semantic analysis) ----------
+   A grammar only describes the shape of a program. These rules need the symbol table:
+
+   S1  every name must be defined before it is used  (δ = Q × Σ → Q cannot come before Q and Σ)
+   S2  a name may only be defined once
+   S3  Q and Σ must not be empty
+   S4  q0 must be in Q, and F must be a subset of Q
+   S5  every state and symbol used in a transition must be in Q and Σ
+   S6  ε may not appear on a transition
+   S7  only one transition per (state, symbol)             (the DFA is deterministic)
+   S8  a transition must exist for every state and symbol  (the DFA is complete)
+   S9  every table row must have one entry per column
+   ---------------------------------------------------------------------- *)
+
+
+(* ---------- 4. EXAMPLES ---------- *)
+(*  Long form:                              Short form:
+      M = (Q, Σ, δ, q0, F)                    M = ({q1, q2}, {a, b}, δ, q1, {q2})
+      Q = {q1, q2}                            δ(q1,a)=q2 δ(q1,b)=q1
+      Σ = {a, b}                              δ(q2,a)=q2 δ(q2,b)=q1
+      δ = Q × Σ → Q
+      q0 = q1
+      F = {q2}
+      δ   a   b
+      q1  q2  q1
+      q2  q2  q1                                                              *)

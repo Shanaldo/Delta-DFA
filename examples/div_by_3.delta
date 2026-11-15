@@ -1,0 +1,13 @@
+# Accepts binary strings representing numbers divisible by three.
+
+Div3 = (Q, Σ, δ, q0, F)
+Q = {r0, r1, r2}
+Σ = {0, 1}
+δ = Q × Σ → Q
+q0 = r0
+F = {r0}
+
+δ    0   1
+r0   r0  r1
+r1   r2  r0
+r2   r1  r2

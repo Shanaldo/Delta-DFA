@@ -1,0 +1,12 @@
+# Shows ASCII spellings for special Delta symbols.
+
+Even = (Q, Sigma, delta, q0, F)
+Q = {even, odd}
+Sigma = {0, 1}
+delta = Q x Sigma -> Q
+q0 = even
+F = {even}
+
+delta  0     1
+even   even  odd
+odd    odd   even
